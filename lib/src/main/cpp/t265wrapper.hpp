@@ -15,7 +15,7 @@
 // <https://www.gnu.org/licenses/>.
 
 #include <jni.h>
-#include <librealsense2/rs.hpp>
+#include "librealsense2/rs.hpp"
 #include <mutex>
 /* Header for class com_spartronics4915_lib_T265Camera */
 

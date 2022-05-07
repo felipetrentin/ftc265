@@ -334,11 +334,15 @@ public class T265Camera {
      */
     public synchronized void setPose(Pose2d newPose) {
         synchronized (mUpdateMutex) {
+            Pose2d campose = (mLastRecievedCameraUpdate == null
+                    ? new Pose2d()
+                    : mLastRecievedCameraUpdate);
+
+            //camera offset, relative to arena
             mOriginOffset =
-                    newPose.relativeTo(
-                            mLastRecievedCameraUpdate == null
-                                    ? new Pose2d()
-                                    : mLastRecievedCameraUpdate);
+                    new Pose2d(
+                            newPose.getTranslation().minus(campose.getTranslation().rotateBy(campose.getRotation().times(-1).plus(newPose.getRotation()))),
+                            newPose.getRotation().minus(campose.getRotation()));
         }
     }
 
@@ -416,8 +420,7 @@ public class T265Camera {
         }
 
         final Pose2d transformedPose =
-                mOriginOffset.transformBy(
-                        new Transform2d(currentPose.getTranslation(), currentPose.getRotation()));
+                mOriginOffset.transformBy(new Transform2d(currentPose.getTranslation(), currentPose.getRotation()));
 
         mPoseConsumer.accept(
                 new CameraUpdate(transformedPose, new ChassisSpeeds(dx, dy, dtheta), confidence));
